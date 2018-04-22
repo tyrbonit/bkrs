@@ -37,7 +37,7 @@ class Vue(Storage):
 
 
     @classmethod
-    def share(cls, key='@vue.share'):
+    def share(cls, key='vue_share'):
         """Декоратор с параметрами для выдачи однофайлового компонента Vue
            Компонет выдается если первый аргумент в URL равен key,
            либо в запросе задан заголовок "vue-component-file"
