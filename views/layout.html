@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!--[if (gt IE 9)|!(IE)]><!--> <html class="no-js" lang="{{=T.accepted_language or 'en'}}"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge{{=not request.is_local and ',chrome=1' or ''}}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{=response.title or request.application}}</title>
+    <meta name="application-name" content="{{=request.application}}">
+    <!-- include stylesheets -->
+    <link rel="stylesheet" href="{{=URL('static','_0.0.0/css/bootstrap.min.css')}}"/>
+    <link rel="stylesheet" href="{{=URL('static','css/web2py-bootstrap3.css')}}"/>
+    <link rel="shortcut icon" href="{{=URL('static','images/favicon.ico')}}" type="image/x-icon">
+    <link rel="apple-touch-icon" href="{{=URL('static','images/favicon.png')}}">
+    <link rel="stylesheet" href="{{=URL('static','js/quilljs/quill.snow.css')}}"/>
+    <link rel="stylesheet" href="{{=URL('static','js/quilljs/quill.bubble.css')}}"/>
+    <link rel="stylesheet" href="{{=URL('static','vue/element-ui/index.css')}}"/>
+    {{include 'web2py_ajax.html'}} <!-- this includes jquery.js, calendar.js/.css and web2py.js -->
+    {{block head}}{{end}}
+      <style>
+          body {
+              padding-top: 20px;
+              margin-bottom: 20px;
+          }
+          .navbar-brand {
+              float: left;
+              padding: 5px 10px;
+              font-size: 18px;
+              line-height: 20px;
+              height: 20px;
+          }
+          .navbar {min-height: 20px;margin: auto;}
+          .navbar-nav>li>a {
+              padding-top: 5px;
+              padding-bottom: 5px;
+          }
+          .navbar-toggle {
+              margin-right: 5px;
+              margin-top: 5px;
+              margin-bottom: 5px;
+              padding: 5px 5px;
+              padding-top: 5px;
+              padding-right: 5px;
+              padding-bottom: 5px;
+              padding-left: 5px;
+          }
+          .footer > .container-fluid {
+              padding-left: 15px;
+              padding-right: 15px;
+              margin: 0;
+              min-height: 20px;
+          }
+          .footer {height: auto;background: none;color: none;}
+          .web2py_console .form-control {vertical-align: middle;}
+          .w2p_query_row input[type=checkbox], .w2p_query_row input[type=radio] {height: 32px;width: 32px;margin: 2px;}
+      </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          {{=response.logo or ''}}
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav navbar-right">
+            {{='auth' in globals() and auth.navbar('Welcome', mode='dropdown') or ''}}
+          </ul>
+          {{if response.menu:}}
+          {{=MENU(response.menu, _class='nav navbar-nav',li_class='dropdown',ul_class='dropdown-menu')}}
+          {{pass}}
+        </div>
+      </div>
+    </nav>
+    <!-- Masthead ===================================== -->
+    {{block header}}
+    {{end}}
+    <!-- Main ========================================= -->
+    <!-- Begin page content -->
+    <div class="container-fluid main-container">
+      <div class="col-md-12">
+        {{block center}}
+        {{include}}
+        {{end center}}
+          <div id="vue-app">
+              {{block vuejs}}{{end vuejs}}
+          </div>
+      </div>
+    </div>
+
+    {{block footer}} <!-- this is default footer -->
+    <footer class="footer">
+      <div class="container-fluid">
+        <div class="copyright pull-left">{{=T('Copyright')}} &#169; {{=request.now.year}}</div>
+          <div id="poweredBy" class="pull-right">
+            {{=T('Powered by')}}
+            <a href="http://www.web2py.com/">web2py</a>
+          </div>
+      </div>
+    </footer>
+    {{end}}
+      <!-- The javascripts =============================== -->
+    <script src="{{=URL('static','js/bootstrap.min.js')}}"></script>
+    <script src="{{=URL('static','js/web2py-bootstrap3.js')}}"></script>
+    <script src="{{=URL('static', 'vue/lodash.min.js')}}"></script>
+    <script src="{{=URL('static', 'vue/vue.js')}}"></script>
+    <script src="{{=URL('static', 'vue/vue_router.js')}}"></script>
+    <!--script src="https://unpkg.com/element-ui/lib/index.js"></script-->
+    <script src="{{=URL('static', 'vue/element-ui/index.js')}}"></script>
+    <script src="{{=URL('static', '_0.0.0/vue/element-ui/ru-RU.js')}}"></script>
+    <script src="{{=URL('static', '_0.0.0/vue/element-ui/data-tables.min.js')}}"></script>
+    <script src="{{=URL('static', 'vue/uiv.min.js')}}"></script>
+    <script src="{{=URL('static', 'vue/vue-strap.min.js')}}"></script>
+    <script src="{{=URL('static', 'vue/vue-resource.min.js')}}"></script>
+    <script src="{{=URL('static', 'vue/vue-async-computed.js')}}"></script>
+    <script src="{{=URL('static', '_1.3.4/vue/httpVueLoader.js')}}"></script>
+    <script src="{{=URL('static', 'js/quilljs/quill.min.js')}}"></script>
+    {{block page_js}}{{end page_js}}
+      <script>
+          ELEMENT.locale(ELEMENT.lang.ruRU);
+          Vue.use(DataTables.DataTablesServer);
+          Vue.use(httpVueLoader);
+          /*console.log(ELEMENT)*/
+          Vue.mixin({
+              components: {
+                  navbar: VueStrap.navbar,
+                  sidebar: VueStrap.sidebar,
+                  vSpinner: VueStrap.spinner,
+                  vAlert: VueStrap.alert
+              },
+          });
+          {{include 'slovar/index.js'}}
+
+            var vueapp = new Vue({
+                el:"#vue-app",
+                data:{
+                    flash: {{=XML(json(response.flash))}}
+                },
+                watch:{
+                    flash:{
+                        handler: function(value){
+                            if (value) {
+                                this.alertHandler({type: 'success', alert: value, duration: 5000})
+                            }
+                        },
+                        immediate: true
+                    }
+                },
+                delimiters: ['<?', '?>'],
+                methods: {
+                    alertHandler(event){
+                        this.$notify({
+                            title: event.title || '',
+                            message: event.alert,
+                            type: event.type || 'info',
+                            offset: 50,
+                            duration: event.duration || 4500
+                        });
+                    }
+                }
+            });
+          jQuery(function(){
+              jQuery('[vue]').each(function (index, element) {
+                  var options = {}, extra = jQuery(element).attr("vue");
+                  if (extra){
+                      if (typeof extra =='string') {
+                          options = eval(extra)
+                      } else {
+                          options = extra
+                      };
+                  };
+                  options.el = element
+                  jQuery(element).removeAttr("vue");
+                  //console.log(options);
+                  new Vue(options);
+              });
+          });
+        </script>
+  </body>
+</html>

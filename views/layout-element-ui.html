@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!--[if (gt IE 9)|!(IE)]><!--> <html class="no-js" lang="{{=T.accepted_language or 'en'}}"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge{{=not request.is_local and ',chrome=1' or ''}}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{=response.title or request.application}}</title>
+    <meta name="application-name" content="{{=request.application}}">
+    <!-- include stylesheets -->
+    <link rel="shortcut icon" href="{{=URL('static','images/favicon.ico')}}" type="image/x-icon">
+    <link rel="apple-touch-icon" href="{{=URL('static','images/favicon.png')}}">
+    <link rel="stylesheet" href="{{=URL('static','vue/element-ui/index.css')}}"/>
+    {{include 'web2py_ajax.html'}} <!-- this includes jquery.js, calendar.js/.css and web2py.js -->
+    {{block head}}{{end}}
+  </head>
+  <body>
+    <div>
+        {{include}}
+    </div>
+      <!-- The javascripts =============================== -->
+    <script src="{{=URL('static', 'vue/vue.min.js')}}"></script>
+    <script src="{{=URL('static', 'vue/element-ui/index.js')}}"></script>
+    <script src="{{=URL('static', '_0.0.0/vue/element-ui/ru-RU.js')}}"></script>
+    <script src="{{=URL('static', '_0.0.0/vue/element-ui/data-tables.min.js')}}"></script>
+    <script src="{{=URL('static', 'vue/vue-resource.min.js')}}"></script>
+    <script src="{{=URL('static', 'vue/vue-async-computed.js')}}"></script>
+    <script src="{{=URL('static', '_1.3.4/vue/httpVueLoader.js')}}"></script>
+    {{block page_js}}{{end page_js}}
+      <script>
+		  ELEMENT.locale(ELEMENT.lang.ruRU)
+          Vue.use(DataTables.DataTablesServer);
+          Vue.use(httpVueLoader);
+          jQuery(function(){
+              jQuery('[vue]').each(function (index, element) {
+                  var options = {}, extra = jQuery(element).attr("vue");
+                  if (extra){
+                      if (typeof extra =='string') {
+                          options = eval(extra)
+                      } else {
+                          options = extra
+                      };
+                  };
+                  options.el = element
+                  jQuery(element).removeAttr("vue");
+                  //console.log(options);
+                  new Vue(options);
+              });
+          });
+        </script>
+  </body>
+</html>

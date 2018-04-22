@@ -1,0 +1,18 @@
+{{extend 'layout.html'}}
+{{block vuejs}}
+<tabs>
+    <tab title="Пословный">
+        <bkrs-common
+             {{='' if 'bywords' in  request.args else 'textarea onchunks'}}
+             {{=XML('text="%s"'%request.vars.text if request.vars.text else '')}}
+             >
+        </bkrs-common>
+    </tab>
+    <tab title="Пиньин">
+        <bkrs-pinyin></bkrs-pinyin>
+    </tab>
+    <tab title="Число-пропись">
+        <chislogon></chislogon>
+    </tab>
+</tabs>
+{{end}}

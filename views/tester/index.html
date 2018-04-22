@@ -1,0 +1,29 @@
+{{extend 'layout.html'}}
+{{=form}}
+{{=H1("Cross=True") if a else ""}}
+{{=a}}
+{{=H1("Cross=False") if b else ""}}
+{{=b}}
+{{=H1("No processed") if c else ""}}
+{{=c}}
+{{=H1("Searching tokens") if d else ""}}
+{{=d}}
+<style type="text/css">
+   body {
+    background: white; /* Цвет фона веб-страницы */
+   }
+   table {
+    width: 100%; /* Ширина таблицы */
+    border-collapse: collapse; /* Убираем двойные линии между ячейками */
+    border: 2px solid white; /* Прячем рамку вокруг таблицы */
+   }
+   td, th {
+    padding: 3px; /* Поля вокруг содержимого таблицы */
+    border: 1px solid maroon; /* Параметры рамки */
+    text-align: left; /* Выравнивание по левому краю */
+   }
+    td:first-child, th:first-child {
+    width: 10%;
+   }
+</style>
+{{=response.toolbar()}}

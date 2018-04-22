@@ -1,0 +1,8 @@
+{{extend 'layout.html'}}
+{{block vuejs}}
+<bkrs-common
+             {{='textarea onchunks' if 'translater' in  request.args else ''}}
+             {{='text=%s'%request.vars.text if request.vars.text else ''}}
+             >
+</bkrs-common>
+{{end}}
