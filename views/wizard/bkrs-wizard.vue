@@ -18,7 +18,7 @@
             <el-step title="Подтверждение запуска">
                 <el-steps :active="task_step" finish-status="success" slot="description" direction="vertical">
                     <el-step title="Постановка в очередь">
-                        <el-alert v-if="stage==1&&task_status==null" slot="description" type="info" title="" show-icon :closable="false">
+                        <el-alert v-if="stage==1" slot="description" type="info" title="" show-icon :closable="false">
                             <span>Запустить процесс заполнения базы? </span>
                             <button type="button"
                                     class="el-button el-button--default el-button--mini is-round"
@@ -96,7 +96,7 @@ module.exports = {
         end_step(){return {"FAILED":0, "STOPPED":1}[this.run_status]},
         stage(){
             return !this.file_ready?0:
-            this.task_status===null||this.task_step<2?1:
+            this.task_step<2?1:
             this.task_step>2&&this.run_step===0?2:
             this.run_step===1?3:4
         },
@@ -110,7 +110,7 @@ module.exports = {
     },
     methods:{
         update(){
-            fetch('{{=URL("stepper.json")}}')
+            fetch('{{=URL(args=["stepper"], extension="json")}}', {method: "GET", credentials: 'include'})
             .then((response) => {
                 if(response.ok) {return response.json()}
                 throw new Error('Error update');
@@ -129,7 +129,7 @@ module.exports = {
             });
         },
         run(){
-            fetch('{{=URL("run.json")}}')
+            fetch('{{=URL(args=["run"], extension="json")}}', {method: "GET", credentials: 'include'})
             .then((response) => {
                 if(response.ok) {return response.json()}
                 throw new Error('Error run');
@@ -142,7 +142,7 @@ module.exports = {
             });
         },
         stop(){
-            fetch('{{=URL("stop.json")}}')
+            fetch('{{=URL(args=["stop"], extension="json")}}', {method: "GET", credentials: 'include'})
             .then((response) => {
                 if(response.ok) {return response.json()}
                 throw new Error('Error run');
@@ -157,7 +157,7 @@ module.exports = {
             });
         },
         start(){
-            fetch('{{=URL("new_start.json")}}')
+            fetch('{{=URL(args=["new_start"], extension="json")}}', {method: "GET", credentials: 'include'})
             .then((response) => {
                 if(response.ok) {return response.json()}
                 throw new Error('Error run');

@@ -107,21 +107,32 @@ def sozdanie_bazy(file, truncate=False):
 
 class Master(object):
 
-    def __init(self):
+    def __init__(self):
         self.scheduler = current._scheduler
-        self.scheduler.tasks['bkrs_init'] = sozdanie_bazy
         self.db = current.db
         self.process = None
-        if not self.scheduler.task_status(self.db.scheduler_task.task_name == 'bkrs_init', output=True):
+        if not self.scheduler.task_status(self.db.scheduler_task.task_name == 'sozdanie_bazy', output=True):
             self.queue_task = self.scheduler.queue_task(
-                'bkrs_init',
+                'sozdanie_bazy',
                 pvars=dict(file="static/dsl/dabkrs.dsl",truncate=True),
                 prevent_drift=True,
                 immediate=True,
                 timeout=10800,
                 sync_output=3)
-        self.task_status = self.scheduler.task_status(self.db.scheduler_task.task_name == 'bkrs_init', output=True)
+        self.task_status = self.scheduler.task_status(self.db.scheduler_task.task_name == 'sozdanie_bazy', output=True)
 
+    def execute(self):
+        cmd = current.request.args
+        cmd = cmd[0] if cmd else None
+        func=dict(
+            stepper=self.stepper,
+            run=self.worker_start,
+            stop=self.stop,
+            new_start=self.clear,
+            set_shorts=self.set_bywords_short,
+            set_penalty=self.set_penalty
+        ).get(cmd, lambda: dict())
+        return func()
 
     def worker_start(self):
         import subprocess
@@ -136,9 +147,9 @@ class Master(object):
             p = subprocess.Popen(cmd, stdout=sys.stdout)
             if p.poll()==None:
                 self.process = p
-                return True
+                return dict(status=True)
         self.process = None
-        return False
+        return dict(status=False)
 
 
     def stop(self):
@@ -146,12 +157,13 @@ class Master(object):
 
 
     def clear(self):
-        self.db(self.db.scheduler_task.task_name == 'bkrs_init').delete()
+        self.db(self.db.scheduler_task.task_name == 'sozdanie_bazy').delete()
         return dict(status=True)
 
 
     def stepper(self):
-        file=os.path.normpath(os.path.join(request.folder, 'static/dsl/dabkrs.dsl'))
+        request=current.request
+        file = os.path.normpath(os.path.join(request.folder, 'static/dsl/dabkrs.dsl'))
         task_status = self.task_status
         if task_status and os.path.exists(file):
             if task_status.scheduler_task.status in ["COMPLETED", "FAILED", "STOPPED"]:
@@ -177,22 +189,29 @@ class Master(object):
 
     def set_bywords_short(self):
         """Добавляет в базу слова с кратким переводом"""
-        file_path=os.path.join(current.request.folder,'static/dsl/shortlist.txt')
+        file_path = os.path.join(current.request.folder,'static/dsl/shortlist.txt')
+        db = current.db
+        slovar = current.db.slovar
         if not os.path.exists(file_path):
-            return False
+            return dict(status=False)
         with open(file_path, mode='r') as f:
             for slovo, short in [x.split("\t") for x in f.read().split("\n")]:
-                row=db(slovar.slovo == slovo).select().first()
+                row = db(slovar.slovo == slovo).select().first()
                 if row:
                     row.update_record(bywords_short = short, use_short = True)
-        return response.json(dict(status=True))
+                else:
+                    current.db.slovar.insert(slovo=slovo, bywords_short = short, use_short = True)
+            db.commit()
+        return dict(status=True)
 
 
-    def set_penaty(self):
+    def set_penalty(self):
         """Задает слова-исключения из пословного перевода"""
         file_path=os.path.join(current.request.folder,'static/dsl/penalty.txt')
+        db = current.db
+        slovar = current.db.slovar
         if not os.path.exists(file_path):
-            return False
+            return dict(status=False)
         with open(file_path, mode='r') as f:
             for x in f.read().replace(',', '\n').split('\n'):
                 slovo = x.strip()
@@ -200,7 +219,9 @@ class Master(object):
                 row = db(slovar.slovo == slovo).select().first()
                 if row:
                     row.update_record(bywords_out = True)
-        return response.json(dict(status=True))
+            db.commit()
+        return dict(status=True)
+
 
 def createlinks():
     """Создание ссылок между записями словарных статей"""
